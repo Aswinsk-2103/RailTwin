@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RailTwin</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#0b0f16;--ink:#f1e9c9;--card:#10151d;--line:#2a3342;--red:#ff5a4d;--amb:#ffb81c;--grn:#5fd38d;--blu:#5aa9ff;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:15px/1.6 "Share Tech Mono","IBM Plex Mono",monospace;
+ background:#0b0f16 repeating-linear-gradient(90deg,transparent 0 79px,rgba(255,255,255,.035) 79px 80px)}
+h1,h2,h3,nav button,.go,.kpi b{font-family:Oswald,"Arial Narrow",Impact,sans-serif}
+/* station name sign */
+header{padding:22px 5vw 0;background:linear-gradient(#0d2c5a,#0a2247);border-bottom:0;position:relative}
+.sign{display:inline-flex;align-items:center;gap:18px;border:4px solid #fff;outline:3px solid #0a2247;padding:6px 26px 6px 8px;background:#12408a;box-shadow:0 8px 0 rgba(0,0,0,.35)}
+.plat{background:#fff;color:#12408a;font:700 34px Oswald,sans-serif;padding:0 14px;line-height:1.3}
+h1{font-size:clamp(34px,6vw,64px);letter-spacing:3px;text-transform:uppercase;color:#fff;margin:0;font-weight:700}h1 b{color:var(--amb)}
+.sub{font:500 13px Oswald,sans-serif;letter-spacing:3px;color:#cfe0ff;text-transform:uppercase}
+header p{max-width:780px;margin:14px 0 14px;color:#dbe6ff}
+.ticker{background:#000;border-top:2px solid var(--amb);border-bottom:2px solid var(--amb);overflow:hidden;white-space:nowrap;margin:0 -5vw;color:var(--amb);padding:4px 0}
+.ticker span{display:inline-block;padding-left:100%;animation:mq 38s linear infinite}@keyframes mq{to{transform:translateX(-100%)}}
+.hazard{height:12px;margin:0 -5vw;background:repeating-linear-gradient(-45deg,var(--amb) 0 14px,#111 14px 28px)}
+#clock{float:right;font:700 30px "Share Tech Mono",monospace;background:#000;color:var(--amb);padding:2px 12px;border:3px solid #ddd;border-radius:50px;letter-spacing:2px}
+/* platform tabs */
+nav{display:flex;gap:10px;padding:16px 5vw;align-items:center;flex-wrap:wrap}nav{counter-reset:p}
+nav>button{counter-increment:p;font-size:16px;letter-spacing:1px;text-transform:uppercase;padding:6px 16px 6px 6px;border:0;background:#e8c547;color:#111;cursor:pointer;display:flex;align-items:center;gap:10px;box-shadow:0 4px 0 #8a6d12}
+nav>button::before{content:counter(p);background:#111;color:var(--amb);padding:0 9px;font-weight:700}
+nav>button.on{background:var(--amb);transform:translateY(3px);box-shadow:0 1px 0 #8a6d12}
+main{padding:0 5vw 50px}section{display:none}section.on{display:block}
+/* departure-board cards */
+.card{background:var(--card);border:2px solid var(--line);border-top:6px solid var(--amb);border-radius:3px;padding:18px;margin:18px 0;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+h2{font-size:22px;letter-spacing:2px;text-transform:uppercase;color:var(--amb);margin:0 0 6px;font-weight:600}
+h2::before{content:"\25B6\00a0";font-size:14px;color:var(--red)}
+h3{color:#fff;letter-spacing:1px;margin:4px 0 8px;font-weight:500}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:end}
+label{display:flex;flex-direction:column;font-size:12px;gap:3px;color:var(--amb);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+select,input[type=text],input[type=time],input[type=password],input[type=file]{font:inherit;padding:7px;background:#000;color:var(--amb);border:1px solid var(--amb);border-radius:0}
+input[type=range]{accent-color:var(--amb)}
+.go{font-weight:600;font-size:16px;letter-spacing:1.5px;text-transform:uppercase;background:var(--amb);color:#0b0e14;border:0;padding:10px 22px;cursor:pointer;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%);padding-right:32px;text-decoration:none;display:inline-block}
+.go:hover{filter:brightness(1.15)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin:18px 0}
+/* ticket cards */
+.kpi{background:#f4ecd3;color:#1b1b1b;padding:8px 14px 8px 20px;border-left:3px dashed #8a7a4a;position:relative;border-radius:4px;font-size:13px;text-transform:uppercase;letter-spacing:1px}
+.kpi::before{content:"";position:absolute;left:-9px;top:50%;width:16px;height:16px;margin-top:-8px;border-radius:50%;background:var(--paper)}
+.kpi b{font-size:30px;display:block;color:#12408a;letter-spacing:0;text-transform:none}
+#banner{background:#000;color:var(--amb);border:2px solid var(--amb);border-left:8px solid var(--amb);text-transform:none;font-size:16px;letter-spacing:.5px}
+#banner::before{display:none}#banner b{font:600 18px Oswald,sans-serif;letter-spacing:1px;display:inline;color:#fff}
+svg{width:100%;height:auto;display:block}text{fill:var(--ink);font-family:"Share Tech Mono",monospace}
+.hint{font-size:12px;opacity:.65}ol li,ul li{margin:7px 0}.rej li{color:var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+table td{padding:4px 10px 4px 0;border-bottom:1px dotted var(--line)}
+a{color:var(--blu)}
+.chat{max-height:240px;overflow:auto;background:#000;padding:10px;border:1px solid var(--amb);color:var(--amb)}.chat p{margin:4px 0}.me{color:#fff}
+.tag{display:inline-block;padding:1px 8px;border:1px solid;margin:2px;font-size:12px;background:#000}
+@keyframes bl{50%{opacity:.25}}.pulse{animation:bl .8s infinite}@keyframes fl{to{stroke-dashoffset:-20}}.flow{stroke-dasharray:6 5;animation:fl .6s linear infinite}
+</style></head><body>
+<header><span id="clock">--:--</span>
+<div class="sign"><span class="plat">1</span><div><h1>Rail<b>Twin</b></h1><div class="sub">Block Scheduling Control &middot; Platform 1</div></div></div>
+<p>A digital twin of a rail corridor. Tell it how long the work will take, watch the trains reroute, and see <i>why</i> the software picked that block.</p>
+<div class="ticker"><span>&#9658; NOW DEPARTING: Express E02 to Foxtrot &nbsp;&nbsp;&#9658; Engineering block under planning &nbsp;&nbsp;&#9658; Loop lines open for diversions &nbsp;&nbsp;&#9658; Please stand behind the yellow line &nbsp;&nbsp;&#9658; RailTwin explains every block decision &nbsp;&nbsp;</span></div><div class="hazard"></div></header>
+<nav><button class="on" data-t="plan">Planner</button><button data-t="learn">Learn</button><button data-t="cal">Calendar</button><button data-t="ask">Ask RailTwin</button>
+<span id="auth" style="margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;align-items:center"></span></nav>
+<main>
+<section id="plan" class="on">
+ <div class="card"><div class="row">
+  <select id="sec" hidden></select><span id="chips" hidden></span>
+  <label style="display:none">Type of work<select id="work"><option>Track renewal</option><option>Signal repair</option><option>OHE inspection</option><option>Bridge examination</option></select></label>
+  <label><span>Duration: <span id="dv">120</span> min</span><input id="dur" type="range" min="30" max="300" step="15" value="120"></label>
+  <button class="go" id="run">Plan block</button></div>
+  <p><b>Just tell RailTwin how long the work will take.</b> It chooses the section and the time that disturb the fewest trains, then shows the diversions live.</p><p class="hint">Demo corridor with 24-hour timetable of express, passenger and freight trains (synthetic data).</p></div>
+ <div class="card"><h2>Live twin</h2>
+  <div class="row" style="align-items:center"><button class="go" id="play" style="background:var(--blu)">&#9654; Play day</button>
+  <input id="clk" type="range" min="0" max="1439" value="360" style="flex:1"><b id="ct">06:00</b></div>
+  <div id="banner" class="kpi" style="margin:10px 0;border-color:var(--grn)">Press Plan block to see the live diversion.</div><svg id="strip" viewBox="0 0 900 200"></svg>
+  <p class="hint"><span class="tag" style="color:var(--red)">express</span><span class="tag" style="color:var(--blu)">passenger</span><span class="tag" style="color:var(--grn)">freight</span> Red hatched = block active. Green dashed curve = loop line (diversion). Orange trains are diverted; blinking red trains are held.</p></div>
+ <div id="multi" class="card" style="display:none"></div>
+ <div id="out" style="display:none">
+  <div class="card row"><b>Save this plan to the calendar:</b><select id="day"><option value="0">Mon</option><option value="1">Tue</option><option value="2">Wed</option><option value="3">Thu</option><option value="4">Fri</option><option value="5">Sat</option><option value="6">Sun</option></select><button class="go" id="save" style="background:var(--grn)">Save</button><span id="smsg" class="hint"></span></div>
+  <div class="kpis" id="kpis"></div>
+  <div class="card"><h2>Why this window?</h2><h3 id="sum"></h3><ol id="steps"></ol><div class="row" style="margin:10px 0"><label>Why not this time? <input id="wn" type="time" value="08:00"></label><button class="go" id="wnb" style="background:var(--blu)">Explain</button></div><ul id="wnr"></ul>
+  <b>Rejected examples</b><ul class="rej" id="rej"></ul></div>
+  <div class="card"><h2>Cost of every start time</h2><p class="hint">Click any bar for a what-if. Green = best, red = peak-hour clash.</p><svg id="bars" viewBox="0 0 900 200"></svg></div>
+  <div class="card"><h2>Time-distance chart</h2><p class="hint">Each line is a train. Dashed orange lines are trains delayed by the selected block.</p><svg id="td" viewBox="0 0 900 300"></svg></div>
+  <div class="card"><h2>Trains affected</h2><div id="aff"></div></div>
+ </div>
+</section>
+<section id="learn"><div class="grid" id="cards"></div></section>
+<section id="cal"><div class="card"><h2>Weekly block calendar</h2><p class="hint" id="calmsg">Planners save blocks; controllers approve or reject them.</p>
+ <div class="row"><a class="go" href="/api/pdf" style="text-decoration:none">Export PDF</a><a href="/api/sample.csv">Sample CSV</a>
+ <label>Import timetable CSV<input type="file" id="csv" accept=".csv"></label><button class="go" id="imp" style="background:var(--blu)">Import</button><span id="imsg" class="hint"></span></div></div>
+ <div class="grid" id="week" style="grid-template-columns:repeat(auto-fit,minmax(135px,1fr))"></div></section>
+<section id="ask"><div class="card"><div class="chat" id="chat"><p>RailTwin: ask me about blocks, headway, priority, peak hours&hellip;</p></div>
+ <div class="row" style="margin-top:8px"><input id="q" type="text" style="flex:1" placeholder="What is a possession?"><button class="go" id="send">Ask</button></div></div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),COL={express:'#ff5a4d',passenger:'#5aa9ff',freight:'#5fd38d'};
+const hm=m=>String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(Math.floor(m%60)).padStart(2,'0');
+let net,plan,sel=null,timer;
+const api=(u,b)=>fetch(u,b?{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}:{}).then(r=>r.json());
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button,section').forEach(e=>e.classList.remove('on'));b.classList.add('on');$('#'+b.dataset.t).classList.add('on')});
+const X=km=>40+km/net.length*820;
+function pos(t,m){const el=m-t.start;if(el<0)return null;const km=el/60*t.speed;if(km>net.length)return null;return t.dir==1?km:net.length-km}
+function strip(){const m=+$('#clk').value;$('#ct').textContent=hm(m);let s='';
+ net.sections.forEach(c=>{const on=plan&&m>=sel&&m<sel+plan.duration&&c.id==plan.section.id;
+  s+=`<line x1="${X(c.a)}" x2="${X(c.b)}" y1="65" y2="65" stroke="${on?'#ff5a4d':'#888'}" stroke-width="${on?10:5}" ${on?'stroke-dasharray="6 4"':''}/><text x="${(X(c.a)+X(c.b))/2}" y="95" font-size="11" text-anchor="middle">${c.id}</text>`});
+ net.stations.forEach(([n,k])=>s+=`<circle cx="${X(k)}" cy="65" r="7" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/><text x="${X(k)}" y="30" font-size="11" text-anchor="middle">${n}</text>`);
+ net.trains.forEach(t=>{const p=pos(t,m);if(p!=null)s+=`<circle cx="${X(p)}" cy="${t.dir==1?55:75}" r="6" fill="${COL[t.type]}"><title>${t.id}</title></circle><text x="${X(p)}" y="${t.dir==1?44:96}" font-size="9" text-anchor="middle">${t.id}</text>`});
+ $('#strip').innerHTML=s}
+function bars(){const c=plan.candidates,mx=Math.max(...c.map(x=>x.cost)),w=820/c.length;let s='';
+ c.forEach((x,i)=>{const h=x.cost/mx*150,f=x.start==plan.best?'#5fd38d':x.peak?'#ff5a4d':'#d9902b';
+  s+=`<rect x="${40+i*w}" y="${170-h}" width="${w-1}" height="${h}" fill="${f}" opacity="${x.start==sel?1:.6}" style="cursor:pointer" onclick="pick(${x.start})"><title>${x.label} cost ${x.cost}</title></rect>`});
+ for(let h=0;h<=24;h+=3)s+=`<text x="${40+h/24*820}" y="190" font-size="10" text-anchor="middle">${String(h).padStart(2,'0')}</text>`;
+ $('#bars').innerHTML=s}
+function td(){const T=m=>40+m/1440*820,K=k=>10+k/net.length*260,aff=new Set(plan.candidates.find(c=>c.start==sel).trains.map(t=>t.id));let s='';
+ net.peaks.forEach(([a,b])=>s+=`<rect x="${T(a)}" y="10" width="${T(b)-T(a)}" height="260" fill="#d9902b" opacity=".12"/>`);
+ const sc=plan.section,c=plan.candidates.find(c=>c.start==sel);
+ s+=`<rect x="${T(sel)}" y="${K(sc.a)}" width="${T(sel+plan.duration)-T(sel)}" height="${K(sc.b)-K(sc.a)}" fill="#ff5a4d" opacity=".55"/>`;
+ net.trains.forEach(t=>{const e=(net.length-0)/t.speed*60,a=t.dir==1?[0,net.length]:[net.length,0];
+  s+=`<line x1="${T(t.start)}" y1="${K(a[0])}" x2="${T(t.start+e)}" y2="${K(a[1])}" stroke="${aff.has(t.id)?'#d9902b':COL[t.type]}" stroke-width="${aff.has(t.id)?2.5:1}" ${aff.has(t.id)?'stroke-dasharray="5 3"':''}/>`});
+ for(let h=0;h<=24;h+=3)s+=`<text x="${T(h*60)}" y="292" font-size="10" text-anchor="middle">${String(h).padStart(2,'0')}</text>`;
+ net.stations.forEach(([n,k])=>s+=`<text x="2" y="${K(k)+3}" font-size="9">${n.slice(0,5)}</text>`);
+ $('#td').innerHTML=s}
+function show(){const c=plan.candidates.find(c=>c.start==sel),e=plan.explanation,ok=sel==plan.best;
+ $('#kpis').innerHTML=`<div class="kpi">Selected window<b>${hm(sel)}-${hm(sel+plan.duration)}</b></div><div class="kpi">Trains affected<b>${c.trains.length}</b></div><div class="kpi">Total delay<b>${c.total_delay}m</b></div><div class="kpi">Cost<b>${c.cost}</b></div><div class="kpi">Saving vs average<b>${ok?e.saving+'%':'-'}</b></div>`;
+ $('#sum').textContent=(ok?'':'What-if: ')+(ok?e.summary:`${hm(sel)} costs ${(c.cost-plan.candidates.find(x=>x.start==plan.best).cost).toFixed(1)} more than the best window`+(c.peak?' and clashes with a peak period.':'.'));
+ $('#steps').innerHTML=e.steps.map(x=>`<li>${x}</li>`).join('');$('#rej').innerHTML=e.rejected.map(x=>`<li>${x}</li>`).join('');
+ $('#aff').innerHTML=c.trains.length?'<table width="100%">'+c.trains.map(t=>`<tr><td>${t.id}</td><td>${t.type}</td><td>${t.enters}</td><td>+${t.delay} min</td><td>${t.why}</td></tr>`).join('')+'</table>':'No trains affected - a clear window.';
+ bars();td();strip()}
+window.pick=s=>{sel=s;$('#clk').value=s;show()};
+$('#run').onclick=async()=>{plan=await api('/api/plan',{section:$('#sec').value,duration:+$('#dur').value,work:$('#work').value});sel=plan.best;$('#out').style.display='block';$('#clk').value=sel;show()};
+$('#dur').oninput=e=>$('#dv').textContent=e.target.value;$('#clk').oninput=strip;
+$('#play').onclick=()=>{if(timer){clearInterval(timer);timer=0;$('#play').innerHTML='&#9654; Play day';return}$('#play').innerHTML='&#10074;&#10074; Pause';
+ timer=setInterval(()=>{$('#clk').value=(+$('#clk').value+6)%1440;strip()},80)};
+const say=(w,t)=>{$('#chat').innerHTML+=`<p class="${w=='me'?'me':''}">${w=='me'?'You':'RailTwin'}: ${t}</p>`;$('#chat').scrollTop=1e5};
+async function ask(){const q=$('#q').value.trim();if(!q)return;say('me',q);$('#q').value='';say('rt',(await api('/api/ask',{q})).answer)}
+$('#send').onclick=ask;$('#q').onkeydown=e=>e.key=='Enter'&&ask();
+const LEARN=[['What is a block?','A planned closure of a track section so crews can work safely. Traffic block = no trains; power block = overhead supply off.'],['Why schedule carefully?','Every minute a block overlaps a train adds delay that ripples through the timetable.'],['What is a digital twin?','A live virtual copy of the line. RailTwin replays every train against a proposed block before anything happens on the ground.'],['How is a window scored?','Cost = delay minutes x train priority + peak-hour penalty. Lower is better.'],['What is headway?','The minimum gap between trains. After a block ends, held trains are released 6 minutes apart.'],['Why explain decisions?','Controllers must trust and justify block plans. RailTwin shows which trains are hit and which windows lost.']];
+$('#cards').innerHTML=LEARN.map(([h,t])=>`<div class="card"><h2 style="font-size:20px">${h}</h2><p>${t}</p></div>`).join('');
+api('/api/network').then(n=>{net=n;$('#sec').innerHTML=n.sections.map(s=>`<option value="${s.id}">${s.id}: ${s.from} - ${s.to}</option>`).join('');strip()});
+
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];let me={},blocks=[];
+function authUI(){$('#auth').innerHTML=me.user?`<span>${me.user} (${me.role})</span><button id="lo" class="go" style="padding:5px 10px">Logout</button>`:
+ `<input id="un" type="text" placeholder="name" size="8"><input id="pw" type="password" placeholder="password" size="8" style="font:inherit;padding:6px"><select id="rl"><option>planner</option><option>controller</option></select><button id="li" class="go" style="padding:5px 10px">Login</button><button id="rg" class="go" style="padding:5px 10px;background:var(--blu)">Register</button>`;
+ if(me.user)$('#lo').onclick=async()=>{await api('/api/logout',{});me={};authUI();loadCal()};
+ else{const a=async u=>{const r=await api(u,{name:$('#un').value,pw:$('#pw').value,role:$('#rl').value});if(r.error)alert(r.error);else{me=r;authUI();loadCal()}};$('#li').onclick=()=>a('/api/login');$('#rg').onclick=()=>a('/api/register')}}
+api('/api/me').then(m=>{me=m.user?m:{};authUI()});
+api('/api/network').then(n=>{$('#chips').innerHTML=n.sections.map((s,i)=>`<label style="flex-direction:row;gap:4px"><input type="checkbox" value="${s.id}" ${i==1?'checked':''}>${s.id}</label>`).join('')});
+const hideSingle=f=>document.querySelectorAll('#out>.card:not(:first-child),#kpis').forEach(e=>e.style.display=f?'none':'');
+const picked=()=>[...document.querySelectorAll('#chips input:checked')].map(i=>i.value);
+$('#run').onclick=async()=>{const sc=picked(),d=+$('#dur').value,w=$('#work').value;if(!sc.length)return alert('Tick at least one section');
+ if(sc.length==1){$('#sec').value=sc[0];$('#multi').style.display='none';hideSingle(false);plan=await api('/api/plan',{section:sc[0],duration:d,work:w});sel=plan.best;$('#out').style.display='block';$('#clk').value=sel;
+  const b=plan.candidates.find(c=>c.start==sel);blocks=[{section:sc[0],start:sel,duration:d,work:w,cost:b.cost}];show()}
+ else{const r=await api('/api/optimise',{sections:sc,duration:d,work:w});if(r.error)return alert(r.error);blocks=r.blocks;$('#out').style.display='block';hideSingle(true);$('#multi').style.display='block';
+  $('#multi').innerHTML=`<h2>Joint plan for ${sc.length} sections</h2><p>${r.note}</p><table width="100%">`+r.blocks.map(b=>`<tr><td><b>${b.section}</b> ${b.route}</td><td>${b.label}-${b.end}</td><td>${b.trains} trains</td><td>cost ${b.cost}</td></tr>`).join('')+`</table><p><b>Total cost ${r.total}</b>. Plan one section alone to see the full charts and explanation.</p>`}};
+$('#save').onclick=async()=>{const r=await api('/api/save',{day:+$('#day').value,blocks});$('#smsg').textContent=r.error||'Saved! See the Calendar tab.';loadCal()};
+$('#wnb').onclick=async()=>{const [h,m]=$('#wn').value.split(':');const r=await api('/api/whynot',{section:plan.section.id,duration:plan.duration,work:plan.work,start:h*60+ +m});$('#wnr').innerHTML=r.reasons.map(x=>`<li>${x}</li>`).join('')};
+async function loadCal(){const r=await api('/api/plans');$('#week').innerHTML=DAYS.map((d,i)=>`<div class="card"><h2 style="font-size:18px">${d}</h2>`+(r.plans.filter(p=>p.day==i).map(p=>`<div class="kpi" style="border-color:${p.status=='approved'?'#5fd38d':p.status=='rejected'?'#ff5a4d':'#d9902b'};margin:6px 0"><b style="font-size:15px">${hm(p.start)}-${hm(p.start+p.duration)}</b>${p.section} - ${p.work}<br><span class="hint">${p.status} - ${p.owner}</span>`+
+ (['controller','admin'].includes(me.role)&&p.status=='proposed'?`<br><a href="#" onclick="dec(${p.id},'approved');return false">approve</a> | <a href="#" onclick="dec(${p.id},'rejected');return false">reject</a>`:'')+'</div>').join('')||'<span class="hint">No blocks</span>')+'</div>').join('')}
+window.dec=async(id,s)=>{await api(`/api/plans/${id}/decide`,{status:s});loadCal()};
+$('#imp').onclick=async()=>{const f=$('#csv').files[0];if(!f)return;const fd=new FormData();fd.append('file',f);const r=await(await fetch('/api/import',{method:'POST',body:fd})).json();
+ $('#imsg').textContent=r.error||`Imported ${r.count} trains.`;if(!r.error)net=await api('/api/network')};
+loadCal();
+
+// ---------- animated twin with diversions ----------
+function posAdj(t,m,c,sc){const L=net.length,a=c.trains.find(x=>x.id==t.id);
+ if(!a||a.action=='clear')return{km:pos(t,m)};
+ const en=t.dir==1?t.start+sc.a/t.speed*60:t.start+(L-sc.b)/t.speed*60,ex=t.dir==1?t.start+sc.b/t.speed*60:t.start+(L-sc.a)/t.speed*60,d=a.delay;
+ if(m<en)return{km:pos(t,m)};
+ if(a.action=='hold'){if(m<en+d)return{km:t.dir==1?sc.a:sc.b,held:1};return{km:pos(t,m-d)}}
+ if(m<ex+d){const f=(m-en)/(ex+d-en);return{km:t.dir==1?sc.a+f*(sc.b-sc.a):sc.b-f*(sc.b-sc.a),by:f}}
+ return{km:pos(t,m-d)}}
+function strip(){const m=+$('#clk').value;$('#ct').textContent=hm(m);const c=plan&&plan.candidates.find(x=>x.start==sel),sc=plan&&plan.section;
+ const on=c&&m>=sel&&m<sel+plan.duration;let s='',nd=0,nh=0;
+ net.sections.forEach(q=>{const mine=sc&&q.id==sc.id,xa=X(q.a),xb=X(q.b);
+  s+=`<path d="M${xa} 80 C${xa+30} 160 ${xb-30} 160 ${xb} 80" fill="none" stroke="${mine&&on?'#5fd38d':'#aaa'}" stroke-width="${mine&&on?3:1.5}" ${mine&&on?'class="flow"':'stroke-dasharray="3 4"'}/>`;
+  s+=`<line x1="${xa}" x2="${xb}" y1="80" y2="80" stroke="${mine&&on?'#ff5a4d':'#888'}" stroke-width="${mine&&on?10:5}" ${mine&&on?'stroke-dasharray="6 4"':''}/><text x="${(xa+xb)/2}" y="105" font-size="11" text-anchor="middle">${q.id}</text>`;
+  if(mine&&on)s+=`<text x="${(xa+xb)/2}" y="62" font-size="24" text-anchor="middle">&#128679;</text>`});
+ net.stations.forEach(([n,k])=>s+=`<circle cx="${X(k)}" cy="80" r="7" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/><text x="${X(k)}" y="25" font-size="11" text-anchor="middle">${n}</text>`);
+ net.trains.forEach(t=>{const p=c?posAdj(t,m,c,sc):{km:pos(t,m)};if(p.km==null)return;
+  let x=X(p.km),y=t.dir==1?70:90,col=COL[t.type],cls='';
+  if(p.by!=null){nd++;y=80+58*Math.sin(Math.PI*p.by);col='#d9902b'}
+  if(p.held){nh++;col='#ff5a4d';cls='pulse'}
+  s+=`<circle class="${cls}" cx="${x}" cy="${y}" r="${p.by!=null||p.held?8:6}" fill="${col}"><title>${t.id}</title></circle><text x="${x}" y="${y-11}" font-size="9" text-anchor="middle">${t.id}${p.by!=null?' via loop':p.held?' HELD':''}</text>`});
+ $('#strip').innerHTML=s;const b=$('#banner');
+ if(!c){b.textContent='Press Plan block to see the live diversion.';return}
+ b.style.borderColor=on?'#ff5a4d':'#5fd38d';
+ b.innerHTML=on?`&#128679; <b>BLOCK ACTIVE on ${sc.id} (${sc.from} - ${sc.to}) until ${hm(sel+plan.duration)}</b> &middot; ${nd} train(s) on the loop line &middot; ${nh} held`:
+  m<sel?`Block planned on <b>${sc.id}</b> from ${hm(sel)}. Trains are running normally.`:`Block cleared at ${hm(sel+plan.duration)}. Normal running resumed.`}
+function routeList(){const c=plan.candidates.find(x=>x.start==sel),sc=plan.section;
+ return c.trains.map(t=>t.action=='divert'?`<li><b>${t.id}</b> (${t.type}) &rarr; diverted via the ${sc.id} loop line, +${t.delay} min</li>`:t.action=='hold'?`<li><b>${t.id}</b> (${t.type}) &rarr; held at ${t.dir==1?sc.from:sc.to} until the block ends, +${t.delay} min</li>`:`<li><b>${t.id}</b> (${t.type}) &rarr; already inside, clears first</li>`).join('')}
+$('#run').onclick=async()=>{const d=+$('#dur').value;plan=await api('/api/auto',{duration:d});sel=plan.best;$('#sec').value=plan.section.id;
+ $('#out').style.display='block';hideSingle(false);const c=plan.candidates.find(x=>x.start==sel);blocks=[{section:plan.section.id,start:sel,duration:d,work:plan.work,cost:c.cost}];
+ $('#multi').style.display='block';$('#multi').innerHTML=`<h2>RailTwin chose section ${plan.section.id} (${plan.section.from} - ${plan.section.to})</h2><p>For a ${d}-minute block this section disturbs the fewest trains. Lowest cost per section:</p><p>`+plan.ranking.map(r=>`<span class="tag" style="${r.section==plan.section.id?'color:var(--grn);font-weight:600':''}">${r.section} ${r.cost}</span>`).join('')+`</p><h3>Train routes during the block</h3><ul>${routeList()||'<li>No trains affected - a clear window.</li>'}</ul>`;
+ show();$('#clk').value=Math.max(0,sel-40);strip();if(!timer)$('#play').click();window.scrollTo({top:document.querySelector('#strip').getBoundingClientRect().top+scrollY-200,behavior:'smooth'})};
+const _pick=window.pick;window.pick=s=>{sel=s;$('#clk').value=Math.max(0,s-40);show();$('#multi').querySelector('ul')&&($('#multi').querySelector('ul').innerHTML=routeList()||'<li>No trains affected.</li>')};
+setInterval(()=>{const d=new Date();$('#clock').textContent=d.toTimeString().slice(0,8)},1000);
+</script></body></html>
